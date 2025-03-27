@@ -1,4 +1,3 @@
-import React from "react";
 import shoe from "/assets/shoeCarousal/shoe.png";
 import { motion, AnimatePresence, Variants } from "motion/react";
 import { ShoeDetails } from "../../constants/ShoeDetails";

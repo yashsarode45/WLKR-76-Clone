@@ -57,7 +57,7 @@ const CarousalPagination = ({
         </svg>
       </button>
       <ul className=" px-[25px] flex gap-2.5">
-        {ShoeDetails.map((shoe, index) => (
+        {ShoeDetails.map((_, index) => (
           <li
             key={index}
             className=" rounded-full size-2  relative cursor-pointer"

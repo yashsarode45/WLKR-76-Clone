@@ -1,4 +1,3 @@
-import React from "react";
 import { RailDetails } from "../constants/RailDetails";
 import RailTrack from "./RailTrack";
 

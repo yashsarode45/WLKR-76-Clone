@@ -1,4 +1,3 @@
-import React from "react";
 import { ShoeDetails } from "../../constants/ShoeDetails";
 import { motion, AnimatePresence, Variants } from "motion/react";
 
