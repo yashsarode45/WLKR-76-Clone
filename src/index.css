@@ -1,0 +1,12 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,500&display=swap"); */
+@import "tailwindcss";
+
+/* @theme {
+  --font-roboto: "Roboto Flex", serif;
+} */
+
+@layer base {
+  html {
+    font-family: "Roboto Flex", serif;
+  }
+}
