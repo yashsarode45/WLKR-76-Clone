@@ -3,14 +3,16 @@ import Cloud from "/assets/images/clouds.webp";
 import { useGSAP } from "@gsap/react";
 import SplitType from "split-type";
 import { gsap } from "gsap";
-
-const Loader = ({
-  setLoader,
-}: {
-  setLoader: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+type LoaderProps = {
+  setLoader: React.Dispatch<React.SetStateAction<boolean>>; // Function to remove loader from DOM
+  startExitAnimation: boolean; // Signal to start the exit animation
+};
+const Loader = ({ setLoader, startExitAnimation }: LoaderProps) => {
   const textRef = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<any>(null);
+
+  const tlRepeat = useRef<gsap.core.Timeline | null>(null); // Ref to hold the repeating timeline
+  const exitTl = useRef<gsap.core.Timeline | null>(null);
 
   useGSAP(() => {
     if (!textRef.current) return;
@@ -64,21 +66,38 @@ const Loader = ({
       "-=0.1"
     );
 
-    // After 1.5 sec, stop the repeating animation and run the exit animations
-    gsap.delayedCall(2, () => {
-      // Stop the repeating timeline
-      tl.kill();
+    tlRepeat.current = tl; // Store the repeating timeline in the ref
+  });
 
-      // Create an exit timeline
-      const exitTl = gsap.timeline({
+  // Effect to handle starting the exit animation
+  useGSAP(() => {
+    // Only run if the exit signal is true AND the repeating timeline exists
+    if (startExitAnimation && tlRepeat.current) {
+      console.log("Loader: Received exit signal.");
+
+      // Stop the repeating timeline
+      tlRepeat.current.kill(); // Use kill() to stop and remove tweens
+
+      // Make sure chars exist before animating exit
+      const chars = splitRef.current?.chars;
+      if (!chars || chars.length === 0) {
+        console.warn("Loader: Cannot start exit animation, chars not found.");
+        setLoader(false); // Hide loader immediately if something is wrong
+        return;
+      }
+
+      // Create and run the exit timeline
+      exitTl.current = gsap.timeline({
         onComplete: () => {
-          setLoader(false);
+          setLoader(false); // Remove loader component from DOM *after* animation finishes
         },
       });
-      exitTl
+
+      exitTl.current
         .to(chars, {
           duration: 0.4,
           scaleY: 0,
+          opacity: 0,
           ease: "power1.inOut",
           stagger: {
             each: 0.04,
@@ -88,23 +107,17 @@ const Loader = ({
         .to(
           ".cloudBG",
           { duration: 0.6, opacity: 0, ease: "power1.inOut" },
-          "-=0.1"
+          "-=0.3"
         )
         .to(
           ".cloudImg",
           { duration: 0.6, opacity: 0, ease: "power1.inOut" },
           "<"
         )
-        .from(
-          ".heroImage",
-          {
-            scale: 1.1,
-            duration: 0.6,
-          },
-          "<"
-        );
-    });
-  });
+        .from(".heroImage", { scale: 1.1, duration: 0.6 }, "<");
+    }
+  }, [startExitAnimation, setLoader]);
+
   return (
     <div className=" fixed inset-0 z-[100] flex items-center justify-center">
       <div className="cloudBG absolute inset-0 bg-[#dddddd]"></div>

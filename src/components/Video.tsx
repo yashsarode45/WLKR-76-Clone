@@ -3,7 +3,11 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import WordAnimation from "./WordAnimation";
 
-const Video = () => {
+type VideoProps = {
+  onImagesLoaded: () => void;
+};
+
+const Video = ({ onImagesLoaded }: VideoProps) => {
   const [val, setval] = useState({
     currentIndex: 1,
     maxIndex: 650,
@@ -11,23 +15,51 @@ const Video = () => {
 
   const imageObject = useRef<HTMLImageElement[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imagesLoader = useRef(0);
   const parentDiv = useRef<HTMLDivElement>(null);
+
+  const imagesLoadedSignaled = useRef(false);
+
   // step 2: Preload Images
   const preload = () => {
-    for (let i = 0; i <= val.maxIndex; i++) {
+    if (imageObject.current.length > 0) return;
+    let loadedCount = 0;
+    for (let i = 1; i <= val.maxIndex; i++) {
       const imagesURL = `../assets/videoimgs/${i
         .toString()
         .padStart(3, "0")}.jpg`;
       const img = new Image();
       img.src = imagesURL;
 
-      img.onload = () => {
-        imagesLoader.current++;
-        if (imagesLoader.current === val.maxIndex) {
-          showImg(val.currentIndex);
+      const handleLoad = () => {
+        loadedCount++;
+
+        if (loadedCount === val.maxIndex && !imagesLoadedSignaled.current) {
+          console.log("All images preloaded."); // For debugging
+          showImg(0); // Show the first frame immediately after loading
+          onImagesLoaded(); // Call the callback function passed from App
+          imagesLoadedSignaled.current = true; // Set the flag
         }
+        // Clean up listeners to prevent potential memory leaks, though less critical here
+        img.removeEventListener("load", handleLoad);
+        img.removeEventListener("error", handleError);
       };
+
+      const handleError = () => {
+        loadedCount++; // Still increment count even on error to not block loading forever
+        console.error(`Failed to load image: ${imagesURL}`);
+        // Decide how to handle errors - maybe call onImagesLoaded anyway after all attempts?
+        if (loadedCount === val.maxIndex && !imagesLoadedSignaled.current) {
+          console.warn("Signaling load complete despite image errors.");
+          showImg(0);
+          onImagesLoaded();
+          imagesLoadedSignaled.current = true;
+        }
+        img.removeEventListener("load", handleLoad);
+        img.removeEventListener("error", handleError);
+      };
+
+      img.addEventListener("load", handleLoad);
+      img.addEventListener("error", handleError);
       imageObject.current.push(img);
     }
   };
@@ -93,10 +125,12 @@ const Video = () => {
       },
     });
   });
+
   // Call the preload
   useEffect(() => {
     preload();
   });
+
   const Words = [
     {
       firstWord: {

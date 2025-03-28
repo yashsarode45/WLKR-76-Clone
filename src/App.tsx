@@ -52,7 +52,34 @@ const App = () => {
     });
   });
 
-  const [loader, setLoader] = useState(true);
+  // Loader related states
+  const [showLoaderComponent, setShowLoaderComponent] = useState(true); // Controls if Loader is in DOM
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const [triggerLoaderExit, setTriggerLoaderExit] = useState(false); // Controls starting the exit animation
+
+  useEffect(() => {
+    // `document.fonts.ready` returns a promise that resolves when all fonts in the document are loaded.
+    document.fonts.ready
+      .then(() => {
+        setFontLoaded(true);
+      })
+      .catch((error) => {
+        console.error("Font loading error:", error);
+        setFontLoaded(true); // Proceed even if font detection fails
+      });
+  }, []);
+
+  const handleImagesLoaded = () => {
+    setImagesLoaded(true);
+  };
+
+  useEffect(() => {
+    if (imagesLoaded && fontLoaded) {
+      setTriggerLoaderExit(true); // Signal Loader to start its exit animation
+    }
+  }, [imagesLoaded, fontLoaded]);
+
   // Detect viewport orientation changes
   useEffect(() => {
     const handleResize = () => {
@@ -71,7 +98,12 @@ const App = () => {
         <NotSupported />
       ) : (
         <div className=" overflow-x-clip bg-black">
-          {loader && <Loader setLoader={setLoader} />}
+          {showLoaderComponent && (
+            <Loader
+              setLoader={setShowLoaderComponent}
+              startExitAnimation={triggerLoaderExit}
+            />
+          )}
           <Navbar />
           <Hero />
           <div
@@ -85,7 +117,7 @@ const App = () => {
             src={CloudGradient}
             className="cloudGradientMove w-full h-full object-cover fixed top-[20%] z-10 scale-150"
           />
-          <Video />
+          <Video onImagesLoaded={handleImagesLoaded} />
           <div className="railTrackContainer w-screen h-screen relative  z-10 mt-[-100vh]">
             <RailTracks />
             <div className=" w-screen h-32 bg-white" />
