@@ -15,10 +15,9 @@ An immersive, animation-driven web experience built from scratch with **React (T
  4. **Staggered Scroll-Linked Word Animations**
     Watch characters animate in opposing directions as you scroll for a captivating text reveal effect. ✨
  5. **Scroll-Linked Image & Text Animations**
-	   * Words animate character-by-character in opposing directions as you scroll, creating a striking visual effect. 
-		* Scroll-linked image reveals are paired with staggered character animations appearing in tracks below one another. 🔠
+	   * Words animate character-by-character in opposing directions as you scroll, creating a striking visual effect.
+    * Scroll-linked image reveals are paired with staggered character animations appearing in tracks below one another. 🔠
  6. **Pinned Product Details Carousel**
-A dynamic carousel that:
 	* A product section remains pinned while scrolling through details. 
 	* Carousel controls (buttons/dots) update product information, imagery, *and* jump the scroll position to relevant points within the pinned section. 
 	* Scrolling naturally within the pinned distance also triggers these updates (debounced for performance).
