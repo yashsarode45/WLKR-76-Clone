@@ -1,4 +1,4 @@
-# # WLKR-76 Clone 👟 - Immersive Product Experience
+# WLKR-76 Clone 👟 - Immersive Product Experience
 An immersive, animation-driven web experience built from scratch with **React (TypeScript)**, **GSAP**, **Motion** (previously Framer Motion), and **Lenis**. This project showcases intricate scrolling interactions and animations to create beautiful, attractive, and engaging websites.
 
 [**Live Demo**](https://wlkr-76-clone-yash.vercel.app/)
